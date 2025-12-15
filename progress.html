@@ -28,7 +28,7 @@
         .container {
             max-width: 900px;
             width: 90%;
-            background: rgba(15, 10, 5, 0.9);
+            background: rgba(15, 10, 5, 0.95);
             padding: 60px;
             border-radius: 15px;
             box-shadow: 0 0 50px rgba(255, 140, 0, 0.3);
@@ -102,6 +102,11 @@
             border-radius: 10px;
         }
         
+        .loading {
+            font-size: 1.2em;
+            color: #ff8c00;
+        }
+        
         .footer {
             margin-top: 40px;
             font-size: 0.9em;
@@ -116,29 +121,8 @@
         <h1>📊 PROGRESS TRACKER 📊</h1>
         
         <div id="progress-content">
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-label">Total Worlds</div>
-                    <div class="stat-value">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Quests Completed</div>
-                    <div class="stat-value">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Viewer Interactions</div>
-                    <div class="stat-value">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">Total Stream Time</div>
-                    <div class="stat-value">0h</div>
-                </div>
-            </div>
-            
-            <div class="status">
-                🎮 Session Status: Offline
-                <br><br>
-                ⚡ Waiting for stream...
+            <div class="loading">
+                ⚡ Loading progress data...
             </div>
         </div>
         
@@ -150,11 +134,123 @@
     </div>
     
     <script>
+        const SHEET_ID = '18hQnP1L7FG-EspSW5tGDKJ0Eu6PP7B8FQqIY67Q2C_k';
+        
         async function loadProgressData() {
-            // TODO: Connect to Google Sheets API
+            try {
+                // Fetch Session Info
+                const sessionUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Active%20Session&range=A2:H2`;
+                const sessionResponse = await fetch(sessionUrl);
+                const sessionText = await sessionResponse.text();
+                const sessionJson = JSON.parse(sessionText.substring(47).slice(0, -2));
+                
+                // Fetch Worlds for total counts
+                const worldsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Worlds`;
+                const worldsResponse = await fetch(worldsUrl);
+                const worldsText = await worldsResponse.text();
+                const worldsJson = JSON.parse(worldsText.substring(47).slice(0, -2));
+                
+                // Fetch Quests for completion count
+                const questsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Quests`;
+                const questsResponse = await fetch(questsUrl);
+                const questsText = await questsResponse.text();
+                const questsJson = JSON.parse(questsText.substring(47).slice(0, -2));
+                
+                displayProgress(sessionJson, worldsJson, questsJson);
+                
+            } catch (error) {
+                console.error('Error loading progress:', error);
+                document.getElementById('progress-content').innerHTML = `
+                    <div class="status">
+                        ⚠️ Error loading progress data
+                        <br><br>
+                        Please check if spreadsheet is publicly shared
+                    </div>
+                `;
+            }
         }
         
-        setInterval(loadProgressData, 30000);
+        function displayProgress(sessionJson, worldsJson, questsJson) {
+            const hasSession = sessionJson.table.rows && sessionJson.table.rows.length > 0;
+            const sessionRow = hasSession ? sessionJson.table.rows[0].c : null;
+            
+            // Calculate totals (skip header row)
+            const totalWorlds = Math.max(0, (worldsJson.table.rows?.length || 1) - 1);
+            const completedQuests = questsJson.table.rows?.slice(1).filter(row => 
+                row.c[7]?.v === 'Complete' || row.c[7]?.v === 'Completed'
+            ).length || 0;
+            
+            const totalInteractions = worldsJson.table.rows?.slice(1).reduce((sum, row) => 
+                sum + (parseInt(row.c[6]?.v) || 0), 0
+            ) || 0;
+            
+            let html = `
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Worlds</div>
+                        <div class="stat-value">${totalWorlds}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Quests Completed</div>
+                        <div class="stat-value">${completedQuests}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Viewer Interactions</div>
+                        <div class="stat-value">${totalInteractions}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Stream Status</div>
+                        <div class="stat-value">${hasSession ? '🔴' : '⚫'}</div>
+                    </div>
+                </div>
+            `;
+            
+            if (hasSession && sessionRow) {
+                const worldName = sessionRow[2]?.v || 'Unknown';
+                const gameplayMode = sessionRow[3]?.v || 'Unknown';
+                const activeQuest = sessionRow[4]?.v || 'None';
+                const sessionType = sessionRow[5]?.v || 'Unknown';
+                const startTime = sessionRow[1]?.v || 'Unknown';
+                
+                html += `
+                    <div class="session-info">
+                        <h2>🎮 CURRENT SESSION</h2>
+                        <div class="session-detail">
+                            <span>🌍 World:</span>
+                            <span>${worldName}</span>
+                        </div>
+                        <div class="session-detail">
+                            <span>⚔️ Mode:</span>
+                            <span>${gameplayMode}</span>
+                        </div>
+                        <div class="session-detail">
+                            <span>📋 Active Quest:</span>
+                            <span>${activeQuest}</span>
+                        </div>
+                        <div class="session-detail">
+                            <span>⏰ Started:</span>
+                            <span>${startTime}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="status">
+                        🎮 Session Status: Offline
+                        <br><br>
+                        ⚡ Waiting for stream...
+                    </div>
+                `;
+            }
+            
+            document.getElementById('progress-content').innerHTML = html;
+        }
+        
+        // Load immediately
+        loadProgressData();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadProgressData, 300000);
     </script>
 </body>
 </html>
