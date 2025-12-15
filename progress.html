@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Progress Tracker - Magical Storm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cinzel', 'Georgia', serif;
+            background: #0a0a0a;
+            color: #f5e6d3;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('https://storage.googleapis.com/agenthub/uid-T8jVUXJgLzR9NEzvdbYGWFa0nR13/custom_agent_interactions/29612d66-194f-4d00-8a7b-07db4e0a492b/generated_image_NviCMS2H8ZXxUguqWfjqgb.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 90%;
+            background: rgba(15, 10, 5, 0.9);
+            padding: 60px;
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(255, 140, 0, 0.3);
+            border: 3px solid #cd853f;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #ff8c00;
+            text-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .stat-box {
+            background: rgba(205, 133, 63, 0.2);
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #cd853f;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #daa520;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .session-info {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .session-info h2 {
+            color: #ff8c00;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .session-detail {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(205, 133, 63, 0.1);
+            border-radius: 5px;
+        }
+        
+        .status {
+            font-size: 1.3em;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #999;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 PROGRESS TRACKER 📊</h1>
+        
+        <div id="progress-content">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Total Worlds</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Quests Completed</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Viewer Interactions</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Stream Time</div>
+                    <div class="stat-value">0h</div>
+                </div>
+            </div>
+            
+            <div class="status">
+                🎮 Session Status: Offline
+                <br><br>
+                ⚡ Waiting for stream...
+            </div>
+        </div>
+        
+        <div class="footer">
+            🔴 Live updates from Magical Storm Quest System
+            <br>
+            Use !progress in Twitch chat to see this page
+        </div>
+    </div>
+    
+    <script>
+        async function loadProgressData() {
+            // TODO: Connect to Google Sheets API
+        }
+        
+        setInterval(loadProgressData, 30000);
+    </script>
+</body>
+</html>
