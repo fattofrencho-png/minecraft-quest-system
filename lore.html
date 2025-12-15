@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 World Lore - Magical Storm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cinzel', 'Georgia', serif;
+            background: #0a0a0a;
+            color: #e6d5c3;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('https://storage.googleapis.com/agenthub/uid-T8jVUXJgLzR9NEzvdbYGWFa0nR13/custom_agent_interactions/29612d66-194f-4d00-8a7b-07db4e0a492b/generated_image_AaoNEnkYNPu7M3NFYXFcYr.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 90%;
+            background: rgba(10, 5, 20, 0.9);
+            padding: 60px;
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(138, 43, 226, 0.4);
+            border: 3px solid #663399;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #da70d6;
+            text-shadow: 0 0 20px rgba(218, 112, 214, 0.6);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+        
+        .world-name {
+            font-size: 2em;
+            color: #9370db;
+            margin: 30px 0;
+            text-shadow: 0 0 15px rgba(147, 112, 219, 0.5);
+        }
+        
+        .lore-content {
+            text-align: left;
+            line-height: 2;
+            font-size: 1.15em;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 10px;
+            border-left: 4px solid #9370db;
+            margin: 30px 0;
+        }
+        
+        .progression {
+            display: inline-block;
+            background: rgba(218, 112, 214, 0.2);
+            padding: 15px 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 2px solid #da70d6;
+        }
+        
+        .status {
+            font-size: 1.3em;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 10px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #999;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📖 WORLD LORE 📖</h1>
+        
+        <div id="lore-content">
+            <div class="status">
+                🌍 No World Active
+                <br><br>
+                ⚡ Waiting for adventure to begin...
+            </div>
+        </div>
+        
+        <div class="footer">
+            🔴 Live updates from Magical Storm Quest System
+            <br>
+            Use !world in Twitch chat to see this page
+        </div>
+    </div>
+    
+    <script>
+        async function loadLoreData() {
+            // TODO: Connect to Google Sheets API
+        }
+        
+        setInterval(loadLoreData, 30000);
+    </script>
+</body>
+</html>
