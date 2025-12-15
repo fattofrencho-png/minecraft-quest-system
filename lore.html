@@ -28,7 +28,7 @@
         .container {
             max-width: 900px;
             width: 90%;
-            background: rgba(10, 5, 20, 0.9);
+            background: rgba(10, 5, 20, 0.95);
             padding: 60px;
             border-radius: 15px;
             box-shadow: 0 0 50px rgba(138, 43, 226, 0.4);
@@ -62,6 +62,26 @@
             margin: 30px 0;
         }
         
+        .lore-entry {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #da70d6;
+        }
+        
+        .lore-title {
+            color: #da70d6;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        
+        .lore-category {
+            color: #9370db;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
         .progression {
             display: inline-block;
             background: rgba(218, 112, 214, 0.2);
@@ -79,6 +99,11 @@
             border-radius: 10px;
         }
         
+        .loading {
+            font-size: 1.2em;
+            color: #da70d6;
+        }
+        
         .footer {
             margin-top: 40px;
             font-size: 0.9em;
@@ -93,10 +118,8 @@
         <h1>📖 WORLD LORE 📖</h1>
         
         <div id="lore-content">
-            <div class="status">
-                🌍 No World Active
-                <br><br>
-                ⚡ Waiting for adventure to begin...
+            <div class="loading">
+                ⚡ Loading world lore...
             </div>
         </div>
         
@@ -108,11 +131,116 @@
     </div>
     
     <script>
+        const SHEET_ID = '18hQnP1L7FG-EspSW5tGDKJ0Eu6PP7B8FQqIY67Q2C_k';
+        
         async function loadLoreData() {
-            // TODO: Connect to Google Sheets API
+            try {
+                // Fetch Active Session for current world
+                const sessionUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Active%20Session&range=A2:H2`;
+                const sessionResponse = await fetch(sessionUrl);
+                const sessionText = await sessionResponse.text();
+                const sessionJson = JSON.parse(sessionText.substring(47).slice(0, -2));
+                
+                if (!sessionJson.table.rows || sessionJson.table.rows.length === 0) {
+                    showNoWorld();
+                    return;
+                }
+                
+                const sessionRow = sessionJson.table.rows[0].c;
+                const worldName = sessionRow[2]?.v; // World Name column
+                
+                if (!worldName) {
+                    showNoWorld();
+                    return;
+                }
+                
+                // Fetch World Info
+                const worldsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Worlds`;
+                const worldsResponse = await fetch(worldsUrl);
+                const worldsText = await worldsResponse.text();
+                const worldsJson = JSON.parse(worldsText.substring(47).slice(0, -2));
+                
+                const worldRow = worldsJson.table.rows.find(row => row.c[1]?.v === worldName);
+                
+                // Fetch Lore entries for this world
+                const loreUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Lore`;
+                const loreResponse = await fetch(loreUrl);
+                const loreText = await loreResponse.text();
+                const loreJson = JSON.parse(loreText.substring(47).slice(0, -2));
+                
+                displayLore(worldName, worldRow, loreJson.table.rows);
+                
+            } catch (error) {
+                console.error('Error loading lore:', error);
+                document.getElementById('lore-content').innerHTML = `
+                    <div class="status">
+                        ⚠️ Error loading lore data
+                        <br><br>
+                        Please check if spreadsheet is publicly shared
+                    </div>
+                `;
+            }
         }
         
-        setInterval(loadLoreData, 30000);
+        function showNoWorld() {
+            document.getElementById('lore-content').innerHTML = `
+                <div class="status">
+                    🌍 No World Active
+                    <br><br>
+                    ⚡ Waiting for adventure to begin...
+                </div>
+            `;
+        }
+        
+        function displayLore(worldName, worldRow, loreRows) {
+            const worldDesc = worldRow?.c[3]?.v || 'A world of mystery and adventure';
+            const progression = worldRow?.c[4]?.v || 'Unknown';
+            const totalQuests = worldRow?.c[5]?.v || '0';
+            
+            let loreHTML = `
+                <div class="world-name">🌍 ${worldName}</div>
+                
+                <div class="lore-content">
+                    ${worldDesc}
+                </div>
+                
+                <div class="progression">
+                    📊 Progression: ${progression} | ✅ Quests: ${totalQuests}
+                </div>
+            `;
+            
+            // Add lore entries (skip header row)
+            const relevantLore = loreRows.slice(1).filter(row => {
+                const loreWorld = row.c[4]?.v || row.c[5]?.v || ''; // Check locations or characters
+                return row.c[1]?.v; // Has a title
+            });
+            
+            if (relevantLore.length > 0) {
+                loreHTML += '<div style="margin-top: 30px;">';
+                relevantLore.forEach(row => {
+                    const title = row.c[1]?.v || 'Untitled';
+                    const category = row.c[2]?.v || 'Legend';
+                    const story = row.c[3]?.v || '';
+                    
+                    loreHTML += `
+                        <div class="lore-entry">
+                            <div class="lore-title">✨ ${title}</div>
+                            <div class="lore-category">${category}</div>
+                            <div>${story}</div>
+                        </div>
+                    `;
+                });
+                loreHTML += '</div>';
+            }
+            
+            document.getElementById('lore-content').innerHTML = loreHTML;
+        }
+        
+        // Load immediately
+        loadLoreData();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadLoreData, 300000);
     </script>
 </body>
 </html>
