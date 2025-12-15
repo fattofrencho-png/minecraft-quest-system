@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Current Quest - Magical Storm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cinzel', 'Georgia', serif;
+            background: #0a0a0a;
+            color: #f5e6d3;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('https://storage.googleapis.com/agenthub/uid-T8jVUXJgLzR9NEzvdbYGWFa0nR13/custom_agent_interactions/29612d66-194f-4d00-8a7b-07db4e0a492b/generated_image_oUxmUV2b8Vynn4bcNBpGq5.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 90%;
+            background: rgba(20, 15, 10, 0.85);
+            padding: 60px;
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+            border: 3px solid #8b7355;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+        
+        .quest-title {
+            font-size: 1.8em;
+            color: #ff9500;
+            margin: 30px 0 20px;
+            text-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+        }
+        
+        .quest-meta {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        
+        .quest-meta span {
+            background: rgba(139, 115, 85, 0.4);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #8b7355;
+        }
+        
+        .quest-description {
+            text-align: left;
+            margin: 30px 0;
+            line-height: 1.8;
+            font-size: 1.1em;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .objectives {
+            text-align: left;
+            margin: 20px 0;
+        }
+        
+        .objectives li {
+            margin: 12px 0;
+            padding-left: 10px;
+            font-size: 1.05em;
+        }
+        
+        .lore-section {
+            background: rgba(75, 0, 130, 0.2);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 2px solid #9370db;
+            font-style: italic;
+        }
+        
+        .status {
+            font-size: 1.3em;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #999;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ CURRENT QUEST ⚔️</h1>
+        
+        <div id="quest-content">
+            <!-- Quest data will be loaded here -->
+            <div class="status">
+                🎮 No Active Quest
+                <br><br>
+                ⚡ Waiting for stream to start...
+            </div>
+        </div>
+        
+        <div class="footer">
+            🔴 Live updates from Magical Storm Quest System
+            <br>
+            Use !quest in Twitch chat to see this page
+        </div>
+    </div>
+    
+    <script>
+        // This will be updated to fetch from your Google Sheets
+        // For now showing placeholder
+        async function loadQuestData() {
+            // TODO: Connect to Google Sheets API
+            // Will pull data from Active Session sheet
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadQuestData, 30000);
+    </script>
+</body>
+</html>
