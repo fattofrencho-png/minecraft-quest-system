@@ -28,7 +28,7 @@
         .container {
             max-width: 900px;
             width: 90%;
-            background: rgba(20, 15, 10, 0.85);
+            background: rgba(20, 15, 10, 0.95);
             padding: 60px;
             border-radius: 15px;
             box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
@@ -57,6 +57,7 @@
             gap: 40px;
             margin: 20px 0;
             font-size: 1.1em;
+            flex-wrap: wrap;
         }
         
         .quest-meta span {
@@ -80,12 +81,22 @@
         .objectives {
             text-align: left;
             margin: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 10px;
         }
         
-        .objectives li {
-            margin: 12px 0;
-            padding-left: 10px;
+        .objectives h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+        
+        .objectives pre {
+            font-family: 'Georgia', serif;
+            white-space: pre-wrap;
             font-size: 1.05em;
+            line-height: 1.8;
+            color: #f5e6d3;
         }
         
         .lore-section {
@@ -95,6 +106,13 @@
             margin: 30px 0;
             border: 2px solid #9370db;
             font-style: italic;
+            text-align: left;
+        }
+        
+        .lore-section h3 {
+            color: #da70d6;
+            margin-bottom: 15px;
+            font-style: normal;
         }
         
         .status {
@@ -105,10 +123,23 @@
             border-radius: 10px;
         }
         
+        .loading {
+            font-size: 1.2em;
+            color: #ffd700;
+        }
+        
         .footer {
             margin-top: 40px;
             font-size: 0.9em;
             color: #999;
+        }
+        
+        .world-info {
+            background: rgba(139, 115, 85, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.95em;
         }
         
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
@@ -119,11 +150,8 @@
         <h1>⚔️ CURRENT QUEST ⚔️</h1>
         
         <div id="quest-content">
-            <!-- Quest data will be loaded here -->
-            <div class="status">
-                🎮 No Active Quest
-                <br><br>
-                ⚡ Waiting for stream to start...
+            <div class="loading">
+                ⚡ Loading quest data...
             </div>
         </div>
         
@@ -135,15 +163,131 @@
     </div>
     
     <script>
-        // This will be updated to fetch from your Google Sheets
-        // For now showing placeholder
+        const SHEET_ID = '18hQnP1L7FG-EspSW5tGDKJ0Eu6PP7B8FQqIY67Q2C_k';
+        const ACTIVE_SESSION_RANGE = 'Active Session!A2:H2';
+        const QUESTS_RANGE = 'Quests!A:M';
+        
         async function loadQuestData() {
-            // TODO: Connect to Google Sheets API
-            // Will pull data from Active Session sheet
+            try {
+                // Fetch Active Session
+                const sessionUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Active%20Session&range=A2:H2`;
+                const sessionResponse = await fetch(sessionUrl);
+                const sessionText = await sessionResponse.text();
+                const sessionJson = JSON.parse(sessionText.substring(47).slice(0, -2));
+                
+                if (!sessionJson.table.rows || sessionJson.table.rows.length === 0) {
+                    showNoQuest();
+                    return;
+                }
+                
+                const sessionRow = sessionJson.table.rows[0].c;
+                const activeQuestId = sessionRow[4]?.v; // Quest ID column
+                
+                if (!activeQuestId || activeQuestId === 'None') {
+                    showNoQuest();
+                    return;
+                }
+                
+                // Fetch Quest Details
+                const questsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Quests`;
+                const questsResponse = await fetch(questsUrl);
+                const questsText = await questsResponse.text();
+                const questsJson = JSON.parse(questsText.substring(47).slice(0, -2));
+                
+                // Find the quest
+                const questRow = questsJson.table.rows.find(row => row.c[0]?.v === activeQuestId);
+                
+                if (!questRow) {
+                    showNoQuest();
+                    return;
+                }
+                
+                displayQuest(questRow.c, sessionRow);
+                
+            } catch (error) {
+                console.error('Error loading quest:', error);
+                document.getElementById('quest-content').innerHTML = `
+                    <div class="status">
+                        ⚠️ Error loading quest data
+                        <br><br>
+                        Please check if spreadsheet is publicly shared
+                    </div>
+                `;
+            }
         }
         
+        function showNoQuest() {
+            document.getElementById('quest-content').innerHTML = `
+                <div class="status">
+                    🎮 No Active Quest
+                    <br><br>
+                    ⚡ Waiting for stream to start...
+                </div>
+            `;
+        }
+        
+        function displayQuest(quest, session) {
+            const questId = quest[0]?.v || 'Unknown';
+            const worldName = quest[1]?.v || 'Unknown';
+            const gameplayMode = quest[2]?.v || 'Unknown';
+            const questName = quest[3]?.v || 'Unnamed Quest';
+            const questType = quest[4]?.v || 'Unknown';
+            const description = quest[5]?.v || 'No description';
+            const objectives = quest[6]?.v || 'No objectives';
+            const status = quest[7]?.v || 'Unknown';
+            const difficulty = quest[8]?.v || 'Unknown';
+            const rewards = quest[9]?.v || 'No rewards';
+            const lore = quest[10]?.v || '';
+            const dateCreated = quest[11]?.v || '';
+            
+            document.getElementById('quest-content').innerHTML = `
+                <div class="quest-title">📜 ${questName}</div>
+                
+                <div class="quest-meta">
+                    <span>⚙️ ${questType}</span>
+                    <span>⭐ ${difficulty}</span>
+                    <span>💡 ${status}</span>
+                </div>
+                
+                <div class="world-info">
+                    🌍 World: ${worldName} | ⚔️ Mode: ${gameplayMode}
+                </div>
+                
+                <div class="quest-description">
+                    <strong>📖 DESCRIPTION:</strong><br><br>
+                    ${description}
+                </div>
+                
+                <div class="objectives">
+                    <h3>🎯 OBJECTIVES:</h3>
+                    <pre>${objectives}</pre>
+                </div>
+                
+                ${lore ? `
+                <div class="lore-section">
+                    <h3>🎭 LORE CONNECTION:</h3>
+                    ${lore}
+                </div>
+                ` : ''}
+                
+                ${rewards ? `
+                <div class="quest-description">
+                    <strong>🏆 REWARDS:</strong><br><br>
+                    ${rewards}
+                </div>
+                ` : ''}
+                
+                <div class="footer" style="margin-top: 30px; font-size: 0.85em;">
+                    📅 Quest ID: ${questId} | Created: ${dateCreated}
+                </div>
+            `;
+        }
+        
+        // Load immediately
+        loadQuestData();
+        
         // Auto-refresh every 30 seconds
-        setInterval(loadQuestData, 30000);
+        setInterval(loadQuestData, 300000);
     </script>
 </body>
 </html>
